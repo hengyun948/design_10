@@ -21,7 +21,7 @@ public class SysUserController {
     private final SysUserService userService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','PROPERTY_STAFF')")
     public Result<PageResult<UserVO>> pageUsers(UserQueryDTO dto) {
         return Result.success(userService.pageUsers(dto));
     }
