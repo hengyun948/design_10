@@ -4,7 +4,7 @@ import com.property.common.api.Result;
 import com.property.common.model.PageResult;
 import com.property.owner.dto.BindHouseDTO;
 import com.property.owner.dto.OwnerQueryDTO;
-import com.property.owner.entity.OwnerInfo;
+import com.property.owner.dto.UpdateOwnerProfileDTO;
 import com.property.owner.service.OwnerInfoService;
 import com.property.owner.vo.OwnerVO;
 import com.property.utils.SecurityUtils;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/owners")
+@RequestMapping("/api/owners")
 @RequiredArgsConstructor
 public class OwnerInfoController {
 
@@ -59,8 +59,8 @@ public class OwnerInfoController {
     }
 
     @PutMapping("/{id}/profile")
-    public Result<Void> updateProfile(@PathVariable Long id, @RequestBody OwnerInfo info) {
-        ownerInfoService.updateOwnerInfo(id, info);
+    public Result<Void> updateProfile(@PathVariable Long id, @RequestBody UpdateOwnerProfileDTO dto) {
+        ownerInfoService.updateOwnerInfo(id, dto);
         return Result.success();
     }
 }

@@ -5,6 +5,7 @@ import com.property.auth.service.AuthService;
 import com.property.auth.vo.LoginVO;
 import com.property.common.api.Result;
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,5 +29,17 @@ public class AuthController {
     @PostMapping("/logout")
     public Result<?> logout() {
         return Result.success();
+    }
+
+    @PostMapping("/change-password")
+    public Result<Void> changePassword(@RequestBody ChangePasswordRequest req) {
+        authService.changePassword(req.getOldPassword(), req.getNewPassword());
+        return Result.success();
+    }
+
+    @Data
+    static class ChangePasswordRequest {
+        private String oldPassword;
+        private String newPassword;
     }
 }

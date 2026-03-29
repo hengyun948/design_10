@@ -58,6 +58,18 @@ public class AuthServiceImpl implements AuthService {
         return buildLoginVO(user, null);
     }
 
+    @Override
+    public void changePassword(String oldPassword, String newPassword) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        SysUser user = userMapper.selectById(userId);
+        if (user == null) throw new BusinessException("用户不存在");
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new BusinessException("原密码错误");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userMapper.updateById(user);
+    }
+
     private LoginVO buildLoginVO(SysUser user, String token) {
         LoginVO vo = new LoginVO();
         vo.setToken(token);

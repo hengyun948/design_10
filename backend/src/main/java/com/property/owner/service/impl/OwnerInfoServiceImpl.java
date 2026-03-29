@@ -9,6 +9,7 @@ import com.property.house.entity.HouseInfo;
 import com.property.house.mapper.HouseInfoMapper;
 import com.property.owner.dto.BindHouseDTO;
 import com.property.owner.dto.OwnerQueryDTO;
+import com.property.owner.dto.UpdateOwnerProfileDTO;
 import com.property.owner.entity.OwnerHouseRel;
 import com.property.owner.entity.OwnerInfo;
 import com.property.owner.mapper.OwnerHouseRelMapper;
@@ -22,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,9 +51,24 @@ public class OwnerInfoServiceImpl extends ServiceImpl<OwnerInfoMapper, OwnerInfo
         Page<SysUser> userPage = sysUserMapper.selectPage(new Page<>(dto.getPageNum(), dto.getPageSize()), userWrapper);
 
         List<Long> userIds = userPage.getRecords().stream().map(SysUser::getId).collect(Collectors.toList());
-        Map<Long, OwnerInfo> ownerInfoMap = userIds.isEmpty() ? Map.of() :
-                list(new LambdaQueryWrapper<OwnerInfo>().in(OwnerInfo::getUserId, userIds))
-                        .stream().collect(Collectors.toMap(OwnerInfo::getUserId, o -> o));
+        Map<Long, OwnerInfo> ownerInfoMap = new HashMap<>();
+        if (!userIds.isEmpty()) {
+            list(new LambdaQueryWrapper<OwnerInfo>().in(OwnerInfo::getUserId, userIds))
+                    .forEach(o -> ownerInfoMap.put(o.getUserId(), o));
+        }
+        // 自动为没有 owner_info 记录的 OWNER 用户创建
+        List<OwnerInfo> toCreate = new ArrayList<>();
+        for (SysUser u : userPage.getRecords()) {
+            if (!ownerInfoMap.containsKey(u.getId())) {
+                OwnerInfo newInfo = new OwnerInfo();
+                newInfo.setUserId(u.getId());
+                toCreate.add(newInfo);
+            }
+        }
+        if (!toCreate.isEmpty()) {
+            saveBatch(toCreate);
+            toCreate.forEach(o -> ownerInfoMap.put(o.getUserId(), o));
+        }
 
         return PageResult.of(userPage.convert(u -> toVO(u, ownerInfoMap.get(u.getId()))));
     }
@@ -128,14 +146,21 @@ public class OwnerInfoServiceImpl extends ServiceImpl<OwnerInfoMapper, OwnerInfo
     }
 
     @Override
-    public void updateOwnerInfo(Long ownerId, OwnerInfo info) {
+    public void updateOwnerInfo(Long ownerId, UpdateOwnerProfileDTO dto) {
         OwnerInfo existing = getById(ownerId);
         if (existing == null) throw new BusinessException("业主信息不存在");
-        existing.setGender(info.getGender());
-        existing.setIdCard(info.getIdCard());
-        existing.setAddress(info.getAddress());
-        existing.setRemark(info.getRemark());
+        existing.setGender(dto.getGender());
+        existing.setIdCard(dto.getIdCard());
+        existing.setAddress(dto.getAddress());
+        existing.setRemark(dto.getRemark());
         updateById(existing);
+        SysUser user = sysUserMapper.selectById(existing.getUserId());
+        if (user != null) {
+            if (dto.getRealName() != null) user.setRealName(dto.getRealName());
+            if (dto.getPhone() != null) user.setPhone(dto.getPhone());
+            if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+            sysUserMapper.updateById(user);
+        }
     }
 
     private OwnerVO toVO(SysUser user, OwnerInfo info) {
