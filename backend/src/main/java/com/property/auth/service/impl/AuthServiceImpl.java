@@ -59,6 +59,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void updateProfile(String realName, String phone, String email) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        SysUser user = userMapper.selectById(userId);
+        if (user == null) throw new BusinessException("用户不存在");
+        if (realName != null) user.setRealName(realName);
+        if (phone != null) user.setPhone(phone);
+        if (email != null) user.setEmail(email);
+        userMapper.updateById(user);
+    }
+
+    @Override
     public void changePassword(String oldPassword, String newPassword) {
         Long userId = SecurityUtils.getCurrentUserId();
         SysUser user = userMapper.selectById(userId);

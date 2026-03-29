@@ -37,9 +37,22 @@ public class AuthController {
         return Result.success();
     }
 
+    @PutMapping("/profile")
+    public Result<Void> updateProfile(@RequestBody UpdateProfileRequest req) {
+        authService.updateProfile(req.getRealName(), req.getPhone(), req.getEmail());
+        return Result.success();
+    }
+
     @Data
     static class ChangePasswordRequest {
         private String oldPassword;
         private String newPassword;
+    }
+
+    @Data
+    static class UpdateProfileRequest {
+        private String realName;
+        private String phone;
+        private String email;
     }
 }
