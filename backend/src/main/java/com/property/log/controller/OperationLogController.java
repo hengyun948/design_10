@@ -2,18 +2,21 @@ package com.property.log.controller;
 
 import com.property.common.api.Result;
 import com.property.common.model.PageResult;
-import lombok.Data;
+import com.property.log.service.OperationLogService;
+import com.property.log.vo.OperationLogVO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-
 @RestController
 @RequestMapping("/api/logs")
+@RequiredArgsConstructor
 public class OperationLogController {
+
+    private final OperationLogService operationLogService;
 
     @GetMapping("/operations")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -24,21 +27,6 @@ public class OperationLogController {
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize
     ) {
-        PageResult<OperationLogVO> result = new PageResult<>();
-        result.setTotal(0);
-        result.setRecords(Collections.emptyList());
-        return Result.success(result);
-    }
-
-    @Data
-    static class OperationLogVO {
-        private String moduleName;
-        private String operationType;
-        private String requestUri;
-        private String operatorName;
-        private String ip;
-        private Long executeTime;
-        private Integer status;
-        private String createTime;
+        return Result.success(operationLogService.page(operatorName, moduleName, status, pageNum, pageSize));
     }
 }

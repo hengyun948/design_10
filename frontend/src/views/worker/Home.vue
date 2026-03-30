@@ -31,8 +31,17 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
+import { getWorkerStats } from '@/api/repair'
+
 const stats = reactive({ pending: 0, processing: 0, done: 0 })
+
+onMounted(async () => {
+  try {
+    const res = await getWorkerStats()
+    Object.assign(stats, res.data)
+  } catch {}
+})
 </script>
 
 <style scoped>

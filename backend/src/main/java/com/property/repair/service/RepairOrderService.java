@@ -10,6 +10,7 @@ import com.property.repair.vo.RepairOrderVO;
 import com.property.repair.vo.RepairProcessVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RepairOrderService extends IService<RepairOrder> {
     PageResult<RepairOrderVO> page(RepairOrderQueryDTO dto);
@@ -23,4 +24,5 @@ public interface RepairOrderService extends IService<RepairOrder> {
     void receive(Long id, Long workerId);
     void finish(Long id, Long workerId, String remark);
     void cancel(Long id, Long operatorId, String reason);
+    Map<String, Long> workerStats(Long workerId);
 }

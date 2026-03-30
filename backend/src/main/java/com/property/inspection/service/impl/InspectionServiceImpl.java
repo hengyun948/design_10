@@ -17,6 +17,7 @@ import com.property.system.entity.SysUser;
 import com.property.system.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionRecordMapper, I
     private LambdaQueryWrapper<InspectionRecord> buildWrapper(InspectionQueryDTO dto) {
         return new LambdaQueryWrapper<InspectionRecord>()
                 .eq(dto.getFacilityId() != null, InspectionRecord::getFacilityId, dto.getFacilityId())
-                .eq(dto.getResult() != null, InspectionRecord::getResult, dto.getResult())
+                .eq(StringUtils.hasText(dto.getResult()), InspectionRecord::getResult, dto.getResult())
                 .orderByDesc(InspectionRecord::getInspectionTime);
     }
 

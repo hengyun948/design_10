@@ -39,11 +39,22 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
 import { useUserStore } from '@/store/user'
+import { getOverview } from '@/api/statistics'
 
 const userStore = useUserStore()
-const stats = reactive({ userCount: 5, ownerCount: 2, houseCount: 0, repairCount: 0 })
+const stats = reactive({ userCount: 0, ownerCount: 0, houseCount: 0, repairCount: 0 })
+
+onMounted(async () => {
+  try {
+    const res = await getOverview()
+    stats.userCount = res.data.userCount ?? 0
+    stats.ownerCount = res.data.ownerCount ?? 0
+    stats.houseCount = res.data.houseCount ?? 0
+    stats.repairCount = res.data.totalRepair ?? 0
+  } catch {}
+})
 </script>
 
 <style scoped>

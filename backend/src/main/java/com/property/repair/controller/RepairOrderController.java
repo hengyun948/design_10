@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/repairs")
@@ -36,6 +37,12 @@ public class RepairOrderController {
         Long userId = SecurityUtils.getCurrentUserId();
         dto.setOwnerId(userId);
         return Result.success(repairOrderService.myOrders(dto));
+    }
+
+    @GetMapping("/worker-stats")
+    @PreAuthorize("hasAuthority('REPAIR_WORKER')")
+    public Result<Map<String, Long>> workerStats() {
+        return Result.success(repairOrderService.workerStats(SecurityUtils.getCurrentUserId()));
     }
 
     @GetMapping("/assigned")

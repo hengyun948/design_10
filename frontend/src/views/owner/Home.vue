@@ -25,12 +25,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { House, Wallet, Tools, Bell, ChatDotRound, Calendar, Van } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 
+import { getPublishedNotices } from '@/api/notice'
+
 const userStore = useUserStore()
 const notices = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await getPublishedNotices({ pageNum: 1, pageSize: 5 })
+    notices.value = res.data?.records || []
+  } catch {}
+})
 
 const quickLinks = [
   { label: '我的房屋', path: '/owner/house', icon: House, color: '#1890ff' },

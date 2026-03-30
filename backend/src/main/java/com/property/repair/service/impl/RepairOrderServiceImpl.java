@@ -227,6 +227,21 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
                 + String.format("%03d", (int) (Math.random() * 1000));
     }
 
+    @Override
+    public Map<String, Long> workerStats(Long workerId) {
+        return Map.of(
+                "pending", count(new LambdaQueryWrapper<RepairOrder>()
+                        .eq(RepairOrder::getAssignedWorkerId, workerId)
+                        .eq(RepairOrder::getStatus, 2)),
+                "processing", count(new LambdaQueryWrapper<RepairOrder>()
+                        .eq(RepairOrder::getAssignedWorkerId, workerId)
+                        .eq(RepairOrder::getStatus, 3)),
+                "done", count(new LambdaQueryWrapper<RepairOrder>()
+                        .eq(RepairOrder::getAssignedWorkerId, workerId)
+                        .eq(RepairOrder::getStatus, 4))
+        );
+    }
+
     private RepairOrderVO toVO(RepairOrder order) {
         RepairOrderVO vo = new RepairOrderVO();
         vo.setId(order.getId());

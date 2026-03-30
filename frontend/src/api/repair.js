@@ -12,6 +12,10 @@ export function getAssignedRepairs(params) {
   return request.get('/repairs/assigned', { params })
 }
 
+export function getWorkerStats() {
+  return request.get('/repairs/worker-stats')
+}
+
 export function getRepairDetail(id) {
   return request.get(`/repairs/${id}`)
 }

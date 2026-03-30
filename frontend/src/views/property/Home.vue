@@ -39,8 +39,20 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
+import { getOverview } from '@/api/statistics'
+
 const stats = reactive({ ownerCount: 0, houseCount: 0, pendingRepair: 0, pendingBill: 0 })
+
+onMounted(async () => {
+  try {
+    const res = await getOverview()
+    stats.ownerCount = res.data.ownerCount ?? 0
+    stats.houseCount = res.data.houseCount ?? 0
+    stats.pendingRepair = res.data.pendingRepair ?? 0
+    stats.pendingBill = res.data.pendingBill ?? 0
+  } catch {}
+})
 </script>
 
 <style scoped>
